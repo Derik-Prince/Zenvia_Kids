@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zenvia Kids | Printable Worksheets & Activity Books</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Quicksand', sans-serif; }
+    h1, h2, h3, .brand-font { font-family: 'Fredoka', cursive; }
+  </style>
+</head>
+<body class="bg-[#FFFDF9] text-gray-800 min-h-screen flex flex-col antialiased">
+
+  <!-- Top Banner -->
+  <div class="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 text-white text-xs sm:text-sm font-bold py-2.5 text-center shadow-sm">
+    🎨 Instant Digital Downloads • Screen-Free Learning for Kids (Ages 1-10)
+  </div>
+
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-purple-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-3xl font-black bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent brand-font tracking-wide">
+          Zenvia Kids.
+        </span>
+        <span class="text-xs bg-purple-100 text-purple-700 font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+          Printables
+        </span>
+      </div>
+      <div class="text-xs sm:text-sm font-semibold text-gray-500 flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+        <span>Instant PDF Access</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="py-12 sm:py-16 px-4 max-w-4xl mx-auto text-center">
+    <span class="inline-block px-4 py-1.5 rounded-full bg-pink-100 text-pink-600 font-bold text-xs uppercase tracking-widest mb-4">
+      Fun • Creative • Educational
+    </span>
+    <h1 class="text-4xl sm:text-6xl font-extrabold text-gray-900 leading-tight">
+      Printable Learning Kits for <span class="text-indigo-600">Curious Minds</span>
+    </h1>
+    <p class="mt-4 text-base sm:text-lg text-gray-600 max-w-2xl mx-auto font-medium">
+      Engaging coloring sheets, tracing workbooks, and toddler activity bundles designed by educators. Download, print, and start learning immediately!
+    </p>
+
+    <!-- Filter Buttons -->
+    <div class="mt-8 flex flex-wrap justify-center gap-2" id="filterContainer">
+      <button onclick="filterAge('all')" class="filter-btn active bg-indigo-600 text-white px-4 py-2 rounded-full text-xs font-bold transition">All Ages</button>
+      <button onclick="filterAge('Ages 1-3')" class="filter-btn bg-purple-50 hover:bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-xs font-bold transition">Toddlers (1-3)</button>
+      <button onclick="filterAge('Ages 3-5')" class="filter-btn bg-purple-50 hover:bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-xs font-bold transition">Preschool (3-5)</button>
+      <button onclick="filterAge('Ages 4-8')" class="filter-btn bg-purple-50 hover:bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-xs font-bold transition">Kindergarten (4-8)</button>
+    </div>
+  </header>
+
+  <!-- Products Grid -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 flex-1 w-full">
+    <div id="loader" class="text-center py-16">
+      <div class="inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-sm text-gray-500 mt-3 font-semibold">Loading fun printables...</p>
+    </div>
+
+    <div id="kidsGrid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+    <div id="emptyView" class="hidden text-center py-16 text-gray-400 font-semibold">No printables found for this category.</div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-purple-100 text-gray-500 text-xs py-10 px-4">
+    <div class="max-w-7xl mx-auto text-center space-y-3">
+      <p class="text-base font-bold text-gray-900 brand-font">Zenvia Kids.</p>
+      <p class="max-w-md mx-auto text-gray-500">
+        High-quality digital downloadable PDF worksheets for parents, teachers, and homeschoolers worldwide.
+      </p>
+      <p class="text-[11px] text-gray-400 pt-3 border-t border-gray-100">
+        © 2026 Zenvia Kids. All rights reserved. Secure checkout delivered powered by Stripe & Gumroad.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Sheet GID: Zenvia Kids USA tab direct CSV export URL
+    const KIDS_CSV_URL = "https://docs.google.com/spreadsheets/d/1q6TyicNnqdnNHawsxvfnJavJe30oryrPShDfkRPXb6M/gviz/tq?tqx=out:csv&sheet=Zenvia%20Kids%20USA";
+
+    let kidsProducts = [];
+
+    function parseCSV(text) {
+      const lines = text.split('\n').filter(r => r.trim().length > 0);
+      if (lines.length < 2) return [];
+
+      const rows = [];
+      for (let i = 1; i < lines.length; i++) {
+        const regex = /(".*?"|[^",\r]+)(?=\s*,|\s*$)/g;
+        const matches = lines[i].match(regex) || [];
+        const cleanRow = matches.map(m => m.replace(/^"|"$/g, '').trim());
+        if (cleanRow.length >= 7) {
+          rows.push({
+            title: cleanRow[0],
+            ageGroup: cleanRow[1] || 'All Ages',
+            originalPrice: cleanRow[2] || '',
+            offerPrice: cleanRow[3] || '2.99',
+            imageUrl: cleanRow[4] || 'https://placehold.co/400x300/f3e8ff/7c3aed?text=Fun+Printable+Kit',
+            storeUrl: cleanRow[5] || '#',
+            pdfLink: cleanRow[6] || '',
+            status: cleanRow[7] || 'Active'
+          });
+        }
+      }
+      return rows;
+    }
+
+    async function loadKidsData() {
+      try {
+        const res = await fetch(KIDS_CSV_URL);
+        const text = await res.text();
+        kidsProducts = parseCSV(text);
+        renderCards(kidsProducts);
+      } catch (err) {
+        console.error("Error loading kids data:", err);
+        document.getElementById('loader').innerHTML = '<p class="text-rose-500">Please make sure sheet permission is set to Anyone with link.</p>';
+      } finally {
+        document.getElementById('loader').classList.add('hidden');
+        document.getElementById('kidsGrid').classList.remove('hidden');
+      }
+    }
+
+    function renderCards(list) {
+      const grid = document.getElementById('kidsGrid');
+      const empty = document.getElementById('emptyView');
+      grid.innerHTML = '';
+
+      const activeList = list.filter(item => (item.status || '').toLowerCase().includes('active'));
+
+      if (!activeList.length) {
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      activeList.forEach(item => {
+        grid.innerHTML += `
+          <div class="bg-white rounded-3xl border border-purple-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+            <div class="relative bg-purple-50/50 p-6 flex items-center justify-center min-h-[240px]">
+              <span class="absolute top-4 left-4 bg-pink-500 text-white font-bold text-xs px-3 py-1 rounded-full shadow-sm">
+                ${item.ageGroup}
+              </span>
+              <img src="${item.imageUrl}" alt="${item.title}" class="max-h-48 w-auto object-contain rounded-xl group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://placehold.co/400x300/f3e8ff/7c3aed?text=Kids+Workbook'">
+            </div>
+
+            <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+              <div>
+                <h3 class="font-bold text-gray-900 text-lg leading-snug group-hover:text-indigo-600 transition-colors">
+                  ${item.title}
+                </h3>
+                <div class="flex items-baseline gap-2 mt-3">
+                  <span class="text-2xl font-black text-indigo-600">$${item.offerPrice}</span>
+                  ${item.originalPrice ? `<span class="text-xs line-through text-gray-400">$${item.originalPrice}</span>` : ''}
+                  <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md ml-auto">INSTANT PDF</span>
+                </div>
+              </div>
+
+              <a href="${item.storeUrl}" target="_blank" rel="noopener"
+                 class="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:opacity-95 text-white font-bold rounded-2xl text-center text-sm shadow-md transition-all flex items-center justify-center gap-2">
+                <span>Download Printable Pack</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </a>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function filterAge(age) {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white');
+        btn.classList.add('bg-purple-50', 'text-purple-700');
+      });
+      event.target.classList.remove('bg-purple-50', 'text-purple-700');
+      event.target.classList.add('bg-indigo-600', 'text-white');
+
+      if (age === 'all') {
+        renderCards(kidsProducts);
+      } else {
+        const filtered = kidsProducts.filter(p => p.ageGroup.toLowerCase().includes(age.toLowerCase()));
+        renderCards(filtered);
+      }
+    }
+
+    loadKidsData();
+  </script>
+</body>
+</html>
